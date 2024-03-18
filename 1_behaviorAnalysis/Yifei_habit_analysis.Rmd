@@ -1,0 +1,179 @@
+---
+title: "Habit_yifei_analysis"
+output: html_document
+date: "2024-03-05"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(flexmix)
+options(scipen = 100)
+```
+
+## R Markdown
+
+
+```{r cars}
+habit_data <- read_csv("my_databases/txt_data/presses_HIS_Mar_2024X.csv")
+```
+
+```{r}
+long_habit <- habit_data %>% 
+  pivot_longer(cols = c(presses_pre, presses_post3), names_to = "time",
+               values_to = "presses") %>% 
+  filter(VALUE != "baseline") %>% 
+  group_by(time) %>% 
+  group_modify(
+    ~ lm(presses ~ GROUP*VALUE, .) %>%
+      anova() %>%
+      broom::tidy()
+  )
+```
+
+```{r}
+long_merge <- habit_data %>% 
+  mutate(presses_12 = (presses_post1 + presses_post2 + presses_post3)/3) %>% 
+  pivot_longer(cols = c(presses_pre, presses_12), names_to = "time",
+               values_to = "presses") %>% 
+  filter(VALUE != "baseline") %>% 
+  group_by(GROUP) %>%
+  group_modify(
+    ~ lm(presses ~ VALUE*time, .) %>%
+      anova() %>%
+      broom::tidy()
+  )
+```
+
+```{r}
+habit_plot <- habit_data %>% 
+  mutate(presses_12 = (presses_post1 + presses_post2 + presses_post3)/3) %>% 
+  pivot_longer(cols = c(presses_pre, presses_12), names_to = "time",
+               values_to = "presses") %>% 
+  group_by(GROUP,VALUE, time) %>% 
+  summarise(mean_press = mean(presses),
+            se_press = sd(presses))
+  
+ggplot(habit_plot, aes(x = time, y = mean_press, fill = VALUE)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~GROUP)
+```
+
+```{r}
+wide_data <- habit_data %>% 
+  filter(VALUE != "baseline") %>% 
+  select(ID, GROUP, VALUE, presses_pre, presses_post) %>% 
+  pivot_wider(names_from = VALUE, values_from = c(presses_pre, presses_post)) %>% 
+  mutate(pre_diff = presses_pre_valued - presses_pre_devalued,
+         post_diff = presses_post_valued - presses_post_devalued)
+
+#unsupervised clustering on training group
+train_cluster <- wide_data %>% 
+  filter(GROUP == 3) %>% 
+  select(pre_diff, post_diff)
+t_cl <- kmeans(train_cluster, 3, nstart = 10)
+plot(train_cluster, col = t_cl$cluster)
+table(t_cl$cluster)
+```
+
+```{r}
+control_cluster <- wide_data %>% 
+  filter(GROUP == 1) %>% 
+  select(pre_diff, post_diff)
+c_cl <- kmeans(control_cluster, 3, nstart = 10)
+plot(control_cluster, col = c_cl$cluster)
+table(c_cl$cluster)
+```
+
+## Explore habit index and behavioral similarity matrix
+
+```{r}
+habit_in <- habit_data %>% 
+  group_by(ID, GROUP) %>% 
+  summarise(habit_index = mean(habit_index)) %>% 
+  filter(!ID %in% c(248, 268, 275, 154, 221, 280))
+
+#according to Gera, they excluded participant 248, 268, 275, 154, 221, 280 due to extreme behavioral patter, so we also exclude here
+```
+Follow Gera et al. (2023), we calculate that 
+```{r}
+#  test what is the number of clusters that best explains the data:
+n_clusters <- stepFlexmix(habit_index ~ GROUP, data = habit_in, control = list(verbose = 0), k = 1:5, nrep = 200)
+getModel(n_clusters, "BIC") # see which model fits best
+```
+
+
+```{r}
+# Repeat the analysis specifying the number of cluster we found best:
+set.seed(5)
+clustered <- flexmix(habit_index ~ GROUP, data = habit_in, k = 2)
+print(table(clusters(clustered), habit_in$GROUP))
+
+habit_in <- habit_in %>% 
+  cbind(cluster = factor(clusters(clustered))) %>% 
+  select(ID, cluster)
+```
+
+### Examine how representational similarity differs
+```{r}
+habit_cluster <- habit_data %>% 
+  left_join(habit_in, by = "ID") %>% 
+  select(ID, GROUP,VALUE, cluster, presses_pre, presses_post, habit_index) %>% 
+  filter(GROUP == 3,
+         VALUE != "baseline",
+         !is.na(cluster)) %>% 
+  pivot_wider(names_from = VALUE, values_from = presses_pre:presses_post)
+```
+
+```{r}
+clus_1 <- habit_cluster %>% 
+  filter(cluster == 1) %>% 
+  select(presses_pre_valued:presses_post_devalued)
+
+cor(clus_1)
+```
+
+```{r}
+clus_2 <- habit_cluster %>% 
+  filter(cluster == 2) %>% 
+  select(presses_pre_valued:presses_post_devalued)
+
+cor_2 <- cor(clus_2)
+cor_data <- as.data.frame(as.table(cor_2))
+```
+
+```{r}
+ggplot(cor_data, aes(Var1, Var2, alpha = Freq)) + 
+  geom_tile() +
+  geom_raster(fill = "maroon") + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(fill = "Correlation")
+```
+
+
+```{r}
+# Set seed for reproducibility
+set.seed(1)
+
+# Assuming df is your data frame and cluster is the column with cluster numbers
+selected_ids_cluster1 <- habit_cluster[habit_cluster$cluster == 1, ]$ID
+selected_ids_cluster2 <- habit_cluster[habit_cluster$cluster == 2, ]$ID
+
+# If there are more than 20 IDs, sample 20 IDs randomly
+if (length(selected_ids_cluster1) > 20) {
+  selected_ids_cluster1 <- sample(selected_ids_cluster1, 20)
+}
+
+if (length(selected_ids_cluster2) > 20) {
+  selected_ids_cluster2 <- sample(selected_ids_cluster2, 20)
+}
+
+# Now you have 20 random IDs from each cluster
+c1 <- as_data_frame(selected_ids_cluster1)
+c2 <- as_data_frame(selected_ids_cluster2)
+cc <- c1 %>% 
+  rbind(c2) 
+writexl::write_xlsx(cc, "preprocess_list.xlsx")
+```
+

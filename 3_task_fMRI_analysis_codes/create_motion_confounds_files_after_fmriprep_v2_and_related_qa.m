@@ -43,18 +43,22 @@ function num_bad_volumes = create_motion_confounds_files_after_fmriprep_v2_and_r
 tic
 
 % set FSL environment
-setenv('FSLDIR','/share/apps/fsl');  % this to tell where FSL folder is
+% setenv('FSLDIR','/share/apps/fsl');  % this to tell where FSL folder is
+% setenv('FSLOUTPUTTYPE', 'NIFTI_GZ'); % this to tell what the output type would be
+% setenv('PATH', [getenv('PATH') ':/share/apps/fsl/bin']);
+
+setenv('FSLDIR','/usr/local/fsl');  % this to tell where FSL folder is
 setenv('FSLOUTPUTTYPE', 'NIFTI_GZ'); % this to tell what the output type would be
-setenv('PATH', [getenv('PATH') ':/share/apps/fsl/bin']);
+setenv('PATH', [getenv('PATH') ':/usr/local/fsl/bin']);
 
 if nargin < 4
-    qa_path = '/export2/DATA/HIS/HIS_server/analysis/QA';
+    qa_path = '/Users/yifei/Desktop/habit_output/QA';
     if nargin < 3
-        main_output_path_rest_fMRI = '/export2/DATA/HIS/HIS_server/analysis/rest_fMRI_data';
+        main_output_path_rest_fMRI = '/Users/yifei/Desktop/habit_output/rest_fMRI_data';
         if nargin < 2
-            main_output_path_task_fMRI = '/export2/DATA/HIS/HIS_server/analysis/task_fMRI_data';
+            main_output_path_task_fMRI = '/Users/yifei/Desktop/habit_output/task_fMRI_data';
             if nargin < 1
-                main_input_path = '/export2/DATA/HIS/HIS_server/BIDS/derivatives/fmriprep';
+                main_input_path = '/Users/yifei/BIDS_tutorial_data/derivatives';
             end
         end
     end

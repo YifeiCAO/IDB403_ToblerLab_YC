@@ -3,7 +3,7 @@ function verify_fMRIprep_output()
 
 % Parameters:
 % ------------
-fMRIprepDerivativeFolder = '/export2/DATA/HIS/HIS_server/BIDS/derivatives/fmriprep/';
+fMRIprepDerivativeFolder = '/Users/yifei/BIDS_tutorial_data/derivatives/';
 
 % Executing:
 % ------------

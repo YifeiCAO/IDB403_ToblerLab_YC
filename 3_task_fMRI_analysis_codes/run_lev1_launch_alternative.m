@@ -10,7 +10,7 @@ function run_lev1_launch_alternative(subjects, model)
 
 %% Parameters:
 % ------------------------------
-launchdir = '/export2/DATA/HIS/HIS_server/codes/launchfiles';
+launchdir   = '/Users/yifei/Desktop/A_ETH_UZH/EEG_Cav/Code_EEG/MultiModalMRI_Habits/3_task_fMRI_analysis_codes/launchfiles'; % The directory where it puts all the launch files
 if nargin < 2
     model = '001';
 end

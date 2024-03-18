@@ -29,7 +29,7 @@ function create_event_files(subj)
 
 %% PARAMETERS
 % Determine whether it is running on the server or my local mac according to the home directory
-homeFolderLocal = '/Users/ranigera';
+homeFolderLocal = '/Users/yifei';
 homeFolderServer = '/export/home/shirangera';
 if strcmp(getenv('HOME'), homeFolderLocal)
     runningOnServer = 0;
@@ -49,12 +49,12 @@ if runningOnServer
     fileWithIncludedParticipants = '/export2/DATA/HIS/HIS_server/BIDS/participants.tsv';
 else
     % data:
-    behavDataFolder    = '/Users/ranigera/HIS_DATA_Local/behavior/';
+    behavDataFolder    = '/Users/yifei/Desktop/A_ETH_UZH/EEG_Cav/Code_EEG/MultiModalMRI_Habits/1_behaviorAnalysis/raw_behavioral_data/';
     % output folders:
-    localOutputFolder  = '/Users/ranigera/HIS_DATA_Local/BIDS/';
+    localOutputFolder  = '/Users/yifei/BIDS_tutorial_data/';
     serverOutputFolder = 'shirangera@boost.tau.ac.il:/export2/DATA/HIS/HIS_server/BIDS/';
     % file  with exclusions:
-    fileWithIncludedParticipants = '/Users/ranigera/HIS_DATA_Local/BIDS/participants.tsv';
+    fileWithIncludedParticipants = '/Users/yifei/BIDS_tutorial_data/participants.tsv';
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -94,7 +94,7 @@ for  i=1:length(subj)
                 groupName = {'3'};%{'3-day'};
         end
         
-        for ii = 1:length(session)
+        for ii = length(session) %modified to analyze only the last session
             sessionX = char(session(ii,1));
             % load task data (collected in the MRI):
             load ([behavDataFolder 'sub-' num2str(subjX) '/1-data/sub-' num2str(subjX) '_HIS_MRI_' groupName{:} 'day_session-' num2str(sessionX(end-1:end)) '.mat']);
@@ -120,10 +120,10 @@ for  i=1:length(subj)
                 movefile(fileToWrite, fileToWrite_tsv)
                 
                 % If not running from the server copy to the right location on the server (inside the BIDS):
-                if ~runningOnServer
-                    targetServerFolder = fullfile(serverOutputFolder, ['sub-' num2str(subjX)], ['ses-' sessionX(end)], 'func', filesep);
-                    system(['rsync -r -a -u --update ' fileToWrite_tsv ' ' targetServerFolder]);
-                end
+                % if ~runningOnServer
+                %     targetServerFolder = fullfile(serverOutputFolder, ['sub-' num2str(subjX)], ['ses-' sessionX(end)], 'func', filesep);
+                %     system(['rsync -r -a -u --update ' fileToWrite_tsv ' ' targetServerFolder]);
+                % end
             end
             
             clear onset duration trial_type
@@ -147,10 +147,10 @@ for  i=1:length(subj)
                 movefile(fileToWrite, fileToWrite_tsv)
                 
                 % If not running from the server copy to the right location on the server (inside the BIDS):
-                if ~runningOnServer
-                    targetServerFolder = fullfile(serverOutputFolder, ['sub-' num2str(subjX)], ['ses-' sessionX(end)], 'func', filesep);
-                    system(['rsync -r -a -u --update ' fileToWrite_tsv ' ' targetServerFolder]);
-                end
+                % if ~runningOnServer
+                %     targetServerFolder = fullfile(serverOutputFolder, ['sub-' num2str(subjX)], ['ses-' sessionX(end)], 'func', filesep);
+                %     system(['rsync -r -a -u --update ' fileToWrite_tsv ' ' targetServerFolder]);
+                % end
             end
             
             clear onset duration trial_type
@@ -174,10 +174,10 @@ for  i=1:length(subj)
                 movefile(fileToWrite, fileToWrite_tsv)
                 
                 % If not running from the server copy to the right location on the server (inside the BIDS):
-                if ~runningOnServer
-                    targetServerFolder = fullfile(serverOutputFolder, ['sub-' num2str(subjX)], ['ses-' sessionX(end)], 'func', filesep);
-                    system(['rsync -r -a -u --update ' fileToWrite_tsv ' ' targetServerFolder]);
-                end
+                % if ~runningOnServer
+                %     targetServerFolder = fullfile(serverOutputFolder, ['sub-' num2str(subjX)], ['ses-' sessionX(end)], 'func', filesep);
+                %     system(['rsync -r -a -u --update ' fileToWrite_tsv ' ' targetServerFolder]);
+                % end
             end
         end
     catch

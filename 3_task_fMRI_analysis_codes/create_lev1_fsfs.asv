@@ -62,20 +62,7 @@ fprintf(['\n** Creating level 1 fsfs for model ' modelName ' **\n'])
 fsfTemplate = fileread(fsfTemplateFile);
 
 % Get all relevant bold files:
-% boldFiles = dir(fullfile(studydir, 'sub*/ses*/func/*desc-preproc_bold.nii.gz'));
-% 获取所有的文件
-allFiles = dir(fullfile(studydir, 'sub*/ses*/func/*desc-preproc_bold.nii.gz'));
-
-% 初始化一个空的结构体数组用于保存最终的文件列表
-boldFiles = struct([]);
-
-% 遍历所有文件，筛选出不包含 'rest' 的文件
-for i = 1:length(allFiles)
-    if contains(allFiles(i).name, 'task-training_run-04') || contains(allFiles(i).name, 'task-extinction')
-        boldFiles = [boldFiles; allFiles(i)];
-    end
-end
-
+boldFiles = dir(fullfile(studydir, 'sub*/ses*/func/*desc-preproc_bold.nii.gz'));
 
 % delete launch files if rewrite_launchfiles is true
 if rewrite_launchfiles

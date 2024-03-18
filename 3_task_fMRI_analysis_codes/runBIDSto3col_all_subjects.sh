@@ -14,10 +14,10 @@
 
 # Parameters:
 # ----------------------------------------------------------------------------------------
-BIDSto3colPath="/export2/DATA/HIS/HIS_server/codes/"
-participantsListFile="/export2/DATA/HIS/HIS_server/BIDS/participants.tsv"
-BIDSpath="/export2/DATA/HIS/HIS_server/BIDS/"
-OutputPath="/export2/DATA/HIS/HIS_server/analysis/task_fMRI_data/" # The relevant derivative folder
+BIDSto3colPath="/Users/yifei/Desktop/A_ETH_UZH/EEG_Cav/Code_EEG/MultiModalMRI_Habits/3_task_fMRI_analysis_codes/"
+participantsListFile="/Users/yifei/BIDS_tutorial_data/participants.tsv"
+BIDSpath="/Users/yifei/BIDS_tutorial_data/"
+OutputPath="/Users/yifei/BIDS_tutorial_data/derivatives/" # The relevant derivative folder
 modelsPath="models" #The mother folder of models inside each subject and session
 onsetsPath="onsets"
 areSessions=1

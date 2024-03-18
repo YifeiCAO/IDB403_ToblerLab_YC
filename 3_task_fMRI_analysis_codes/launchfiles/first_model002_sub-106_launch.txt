@@ -1,0 +1,4 @@
+feat /Users/yifei/Desktop/A_ETH_UZH/EEG_Cav/Code_EEG/MultiModalMRI_Habits/3_task_fMRI_analysis_codes/fsfs/lev1/design_lev1_model-002_sub-106_ses-1_task-extinction.fsf
+feat /Users/yifei/Desktop/A_ETH_UZH/EEG_Cav/Code_EEG/MultiModalMRI_Habits/3_task_fMRI_analysis_codes/fsfs/lev1/design_lev1_model-002_sub-106_ses-1_task-reacquisition.fsf
+feat /Users/yifei/Desktop/A_ETH_UZH/EEG_Cav/Code_EEG/MultiModalMRI_Habits/3_task_fMRI_analysis_codes/fsfs/lev1/design_lev1_model-002_sub-106_ses-1_task-training_run-01.fsf
+feat /Users/yifei/Desktop/A_ETH_UZH/EEG_Cav/Code_EEG/MultiModalMRI_Habits/3_task_fMRI_analysis_codes/fsfs/lev1/design_lev1_model-002_sub-106_ses-1_task-training_run-02.fsf

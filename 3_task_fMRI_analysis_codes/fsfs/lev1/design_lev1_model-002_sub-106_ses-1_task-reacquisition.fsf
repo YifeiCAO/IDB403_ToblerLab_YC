@@ -30,13 +30,13 @@ set fmri(featwatcher_yn) 0
 set fmri(sscleanup_yn) 0
 
 # Output directory
-set fmri(outputdir) "DATAANALYSISDIR/sub-SUBNUM/ses-SESNUM/models/modelMODELNAME/sub-SUBNUM_ses-SESNUM_task-TASKNAME_run-RUNNUM"
+set fmri(outputdir) "/Users/yifei/BIDS_tutorial_data/derivatives/sub-106/ses-1/models/model002/sub-106_ses-1_task-reacquisition"
 
 # TR(s)
 set fmri(tr) 1.000000 
 
 # Total volumes
-set fmri(npts) NUMVOLS
+set fmri(npts) 192
 
 # Delete volumes
 set fmri(ndelete) 0
@@ -273,13 +273,13 @@ set fmri(totalVoxels) 444549060
 set fmri(ncopeinputs) 0
 
 # 4D AVW data or FEAT directory (1)
-set feat_files(1) "DATAANALYSISDIR/sub-SUBNUM/ses-SESNUM/func/sub-SUBNUM_ses-SESNUM_task-TASKNAME_run-RUNNUM_space-MNI152NLin2009cAsym_res-2_desc-preproc_bold"
+set feat_files(1) "/Users/yifei/BIDS_tutorial_data/derivatives/sub-106/ses-1/func/sub-106_ses-1_task-reacquisition_space-MNI152NLin2009cAsym_res-2_desc-preproc_bold"
 
 # Add confound EVs text file
 set fmri(confoundevs) 1
 
 # Confound EVs text file for analysis 1
-set confoundev_files(1) "DATAANALYSISDIR/sub-SUBNUM/ses-SESNUM/func/sub-SUBNUM_ses-SESNUM_task-TASKNAME_run-RUNNUM_desc-confounds_timeseries.tsv"
+set confoundev_files(1) "/Users/yifei/BIDS_tutorial_data/derivatives/sub-106/ses-1/func/sub-106_ses-1_task-reacquisition_desc-confounds_timeseries.tsv"
 
 # EV 1 title
 set fmri(evtitle1) "valued_onset"
@@ -313,7 +313,7 @@ set fmri(tempfilt_yn1) 1
 set fmri(deriv_yn1) 1
 
 # Custom EV file (EV 1)
-set fmri(custom1) "DATAANALYSISDIR/sub-SUBNUM/ses-SESNUM/models/modelMODELNAME/onsets/sub-SUBNUM_ses-SESNUM_task-TASKNAME_run-RUNNUM_valued_onset.txt"
+set fmri(custom1) "/Users/yifei/BIDS_tutorial_data/derivatives/sub-106/ses-1/models/model002/onsets/sub-106_ses-1_task-reacquisition_valued_onset.txt"
 
 # Orthogonalise EV 1 wrt EV 0
 set fmri(ortho1.0) 0
@@ -359,7 +359,7 @@ set fmri(tempfilt_yn2) 1
 set fmri(deriv_yn2) 1
 
 # Custom EV file (EV 2)
-set fmri(custom2) "DATAANALYSISDIR/sub-SUBNUM/ses-SESNUM/models/modelMODELNAME/onsets/sub-SUBNUM_ses-SESNUM_task-TASKNAME_run-RUNNUM_devalued_onset.txt"
+set fmri(custom2) "/Users/yifei/BIDS_tutorial_data/derivatives/sub-106/ses-1/models/model002/onsets/sub-106_ses-1_task-reacquisition_devalued_onset.txt"
 
 # Orthogonalise EV 2 wrt EV 0
 set fmri(ortho2.0) 0
@@ -405,7 +405,7 @@ set fmri(tempfilt_yn3) 1
 set fmri(deriv_yn3) 1
 
 # Custom EV file (EV 3)
-set fmri(custom3) "DATAANALYSISDIR/sub-SUBNUM/ses-SESNUM/models/modelMODELNAME/onsets/sub-SUBNUM_ses-SESNUM_task-TASKNAME_run-RUNNUM_baseline_onset.txt"
+set fmri(custom3) "/Users/yifei/BIDS_tutorial_data/derivatives/sub-106/ses-1/models/model002/onsets/sub-106_ses-1_task-reacquisition_baseline_onset.txt"
 
 # Orthogonalise EV 3 wrt EV 0
 set fmri(ortho3.0) 0

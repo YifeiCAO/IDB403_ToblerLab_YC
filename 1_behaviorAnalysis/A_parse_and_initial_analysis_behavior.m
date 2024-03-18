@@ -30,7 +30,7 @@ analysis_name      = ['HIS_' time{2} '_' time{3}];
 
 % DIRECTORIES:
 % codes:
-homedir                   = './'; % change this so that it correspond to your analysis folder
+homedir                   = '/Users/yifei/Desktop/A_ETH_UZH/EEG_Cav/Code_EEG/MultiModalMRI_Habits/1_behaviorAnalysis/'; % change this so that it correspond to your analysis folder
 fileWithExclusions        = 'exclusion_list.txt';
 % data:
 behavDataFolder           = 'raw_behavioral_data/';
@@ -187,6 +187,13 @@ if extract_subj_data
             idx.(name) = strcmp(DATA.(['day' num2str(length(fieldnames(DATA)))]).extinction.value, name);
             % get mean responding by condition during extinction
             responding.post.(name) (:,i) = nanmean(DATA.(['day' num2str(length(fieldnames(DATA)))]).extinction.pressFreq (idx.(name)));
+            ext_index = find(idx.(name));
+            ext_first = ext_index(1);
+            ext_second = ext_index(2);
+            ext_third = ext_index(3);
+            responding.post1.(name)  (:,i) = DATA.(['day' num2str(length(fieldnames(DATA)))]).extinction.pressFreq(ext_first);
+            responding.post2.(name) (:,i) = DATA.(['day' num2str(length(fieldnames(DATA)))]).extinction.pressFreq(ext_second);
+            responding.post3.(name) (:,i) = DATA.(['day' num2str(length(fieldnames(DATA)))]).extinction.pressFreq(ext_third);
             % exploratory:
             firstmin = DATA.(['day' num2str(length(fieldnames(DATA)))]).extinction.pressFreq (idx.(name));
             responding.post1min.(name) (:,i) = firstmin(1);
@@ -208,6 +215,9 @@ if extract_subj_data
         
         Rresponding.pre(:,i)          = [responding.pre.valued(:,i) ; responding.pre.devalued(:,i) ; responding.pre.baseline(:,i)] ;
         Rresponding.post(:,i)         = [responding.post.valued(:,i); responding.post.devalued(:,i); responding.post.baseline(:,i)];
+        Rresponding.post1(:,i)         = [responding.post1.valued(:,i); responding.post1.devalued(:,i); responding.post1.baseline(:,i)];
+        Rresponding.post2(:,i)         = [responding.post2.valued(:,i); responding.post2.devalued(:,i); responding.post2.baseline(:,i)];
+        Rresponding.post3(:,i)         = [responding.post3.valued(:,i); responding.post3.devalued(:,i); responding.post3.baseline(:,i)];
         Rresponding.reacquisition(:,i)= [responding.reacquisition.valued(:,i); responding.reacquisition.devalued(:,i); responding.reacquisition.baseline(:,i)];
         Rresponding.change(:,i)       = [pressxsec.valued(:,i); pressxsec.devalued(:,i); pressxsec.baseline(:,i)];
         Rresponding.value(:,i)        = {             'valued';              'devalued';              'baseline'};
@@ -405,6 +415,9 @@ if save_results
     presses_post          = num2cell(Rresponding.post(:));
     presses_reacquisition = num2cell(Rresponding.reacquisition(:));
     presses_change        = num2cell(Rresponding.change(:));
+    presses_post1         = num2cell(Rresponding.post1(:));
+    presses_post2         = num2cell(Rresponding.post2(:));
+    presses_post3         = num2cell(Rresponding.post3(:));
     % Create the variabe of change/habit index for the table:
     habit_index = repelem(Rresponding.habit_index(:), length(list_name));
     
@@ -422,126 +435,126 @@ if save_results
     trainingPressingRateExcludingLastRun = num2cell(repelem([avgTrainingPressRate1dayExcludingLastRun; avgTrainingPressRate3dayExcludingLastRun],3,1));
 
     % database
-    database = table(ID, GROUP, VALUE, presses_pre, presses_post, presses_reacquisition, presses_change, habit_index, trainingPressingRate, trainingPressingRateExcludingLastRun);
+    database = table(ID, GROUP, VALUE, presses_pre, presses_post, presses_post1,presses_post2,presses_post3, presses_reacquisition, presses_change, habit_index, trainingPressingRate, trainingPressingRateExcludingLastRun);
     % write database in csv file
     writetable(database, [txt_dir 'presses_' analysis_name 'X.csv'])
     
 end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% PRIMARY GRAPH - PLOT DATA BY GROUP AND CONDITION
-if primary_graph_on
-    create_diffIndex_plot('Difference Index [post-pre]', pressxsec.group.day1,...
-        pressxsec.group.day3);
-end
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %% PRIMARY GRAPH - PLOT DATA BY GROUP AND CONDITION
+% if primary_graph_on
+%     create_diffIndex_plot('Difference Index [post-pre]', pressxsec.group.day1,...
+%         pressxsec.group.day3);
+% end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% SUBPLOT - A BAR PLOT FOR EACH SUBJECT
-if plotPerSubject
-    groups = {'day1', 'day3'};
-    for g=1:length(groups)
-        if strcmp(groups{g}, 'day1')
-            subject_list = unique(Rresponding.ID((strcmp(Rresponding.group,'1'))));
-        elseif strcmp(groups{g}, 'day3')
-            subject_list = unique(Rresponding.ID((strcmp(Rresponding.group,'3'))));
-        end
-        figure()
-        for i=1:length(pressxsec.group.(groups{g}).valued)
-            subplot(8,8,i)
-            bar([pressxsec.group.(groups{g}).valued(i), pressxsec.group.(groups{g}).devalued(i)])
-            labelx = {'Valued','Devalued'};
-            set(gca,'xticklabel',labelx)
-            hold on
-            bar([pressxsec.group.(groups{g}).valued(i), NaN],'r')
-            bar([NaN, pressxsec.group.(groups{g}).devalued(i)])
-            title(['sub ' num2str(subject_list(i))])
-            ylim([-5 1])
-            
-            hold off
-        end
-        a = axes;
-        t1 = title(groups{g},'FontSize',16);
-        a.Visible = 'off'; % set(a,'Visible','off');
-        t1.Visible = 'on'; % set(t1,'Visible','on');
-    end
-end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% PLOT ADDITIONAL GRAPHS - ratings, change index etc.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if plot_ratings
-    % create_prepost_plot ('Food liking', ratings.pre, ratings.post);
-    create_prePostAfter_plot ('Food liking', ratings.pre, ratings.post, ratings.afterExperiment, {'PRE','POST', sprintf(' AFTER THE\nEXPERIMENT')});
-    % liking ratings
-    create_plot_means ('Fractal liking', ratings.fractal, {'val', 'deval', 'baseline'});
-    % contincencies ratings
-    create_plot_means ('Fractal contingencies', ratings.contingency, {'val', 'deval', 'baseline'});
-    % hunger ratings
-    hungerStruct = struct('pre',ratings.pre.hunger, 'post', ratings.post.hunger, 'afterExperiment', ratings.afterExperiment.hunger);
-    create_plot_means ('Hunger Ratings', hungerStruct, {'pre', 'post', 'after'} )
-end
-
-if plot_responses_elaborated
-    % plot fractal responding
-    % create_prepost_plot ('Responding ', responding.pre, responding.post);
-    create_prepost_plot ('Responding 1-Day Group', responding.pre.group.day1, responding.post.group.day1);
-    create_prepost_plot ('Responding 3-Day Group', responding.pre.group.day3, responding.post.group.day3);
-    % include reacquisition
-    create_prePostAfter_plot ('Responding 1-Day Group', responding.pre.group.day1, responding.post.group.day1, responding.reacquisition.group.day1, {'PRE','POST', 'REACQUISITION'});
-    create_prePostAfter_plot ('Responding 3-Day Group', responding.pre.group.day3, responding.post.group.day3, responding.reacquisition.group.day3, {'PRE','POST', 'REACQUISITION'});
-end
-
-if plot_change_index
-    % impact of devaluation on reponding
-    create_plot_means_simple ('impact of devaluation on change index',  change_index);
-end
-
-if plot_post_responding_index
-    post_index.day1   = presspost.group.day1.valued - presspost.group.day1.devalued;
-    post_index.day3   = presspost.group.day3.valued - presspost.group.day3.devalued;
-    create_plot_means_simple ('impact of devaluation on post pressing',  post_index);
-end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% LEARNING TRAJECTORIES
-if plot_learning_trajectories
-    figure;
-    subplot(1,4,1)
-    title('1-Day group')
-    hold
-    plot(nanmean(learning.day1group.day1.deval,2),'-o', 'color', [0.2 0.2 0.2], 'MarkerFaceColor',[0 0 0] )
-    plot(nanmean(learning.day1group.day1.val,2),'-o', 'color',  [0.5 0.8 0.1],'MarkerFaceColor',[0.5 0.8 0.1])
-    xlabel('Training Trials')
-    ylabel('Responding')
-    ylim([2,5])
-    
-    for i = 1:3
-        dayX = ['day' num2str(i)];
-        subplot(1,4,i+1)
-        title(['3-Day group - DAY ' num2str(i)])
-        hold
-        plot(nanmean(learning.day3group.(['day' num2str(i)]).deval,2),'-o', 'color', [0.2 0.2 0.2], 'MarkerFaceColor',[0 0 0] )
-        plot(nanmean(learning.day3group.(['day' num2str(i)]).val,2),'-o', 'color',  [0.5 0.8 0.1],'MarkerFaceColor',[0.5 0.8 0.1])
-        xlabel('Training Trials')
-        ylim([2,5])
-    end
-    
-    set(gcf, 'Position', [50 100 1200 400])
-    set(gcf, 'Color', 'w')
-    box off
-    
-    LEG = legend('Devalued','Valued');
-    set(LEG,'FontSize',12); %
-    set(LEG,'Box', 'off');
-    set(LEG, 'Position', [0.850 0.400 0.150 0.100])
-    
-    suptitle('LEARNING TRAJECTORIES')
-end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Save figures and create html
-if save_all_figures
-    SaveAllOpenedFigures(figures_dir)
-end
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %% SUBPLOT - A BAR PLOT FOR EACH SUBJECT
+% if plotPerSubject
+%     groups = {'day1', 'day3'};
+%     for g=1:length(groups)
+%         if strcmp(groups{g}, 'day1')
+%             subject_list = unique(Rresponding.ID((strcmp(Rresponding.group,'1'))));
+%         elseif strcmp(groups{g}, 'day3')
+%             subject_list = unique(Rresponding.ID((strcmp(Rresponding.group,'3'))));
+%         end
+%         figure()
+%         for i=1:length(pressxsec.group.(groups{g}).valued)
+%             subplot(8,8,i)
+%             bar([pressxsec.group.(groups{g}).valued(i), pressxsec.group.(groups{g}).devalued(i)])
+%             labelx = {'Valued','Devalued'};
+%             set(gca,'xticklabel',labelx)
+%             hold on
+%             bar([pressxsec.group.(groups{g}).valued(i), NaN],'r')
+%             bar([NaN, pressxsec.group.(groups{g}).devalued(i)])
+%             title(['sub ' num2str(subject_list(i))])
+%             ylim([-5 1])
+% 
+%             hold off
+%         end
+%         a = axes;
+%         t1 = title(groups{g},'FontSize',16);
+%         a.Visible = 'off'; % set(a,'Visible','off');
+%         t1.Visible = 'on'; % set(t1,'Visible','on');
+%     end
+% end
+% 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %% PLOT ADDITIONAL GRAPHS - ratings, change index etc.
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% if plot_ratings
+%     % create_prepost_plot ('Food liking', ratings.pre, ratings.post);
+%     create_prePostAfter_plot ('Food liking', ratings.pre, ratings.post, ratings.afterExperiment, {'PRE','POST', sprintf(' AFTER THE\nEXPERIMENT')});
+%     % liking ratings
+%     create_plot_means ('Fractal liking', ratings.fractal, {'val', 'deval', 'baseline'});
+%     % contincencies ratings
+%     create_plot_means ('Fractal contingencies', ratings.contingency, {'val', 'deval', 'baseline'});
+%     % hunger ratings
+%     hungerStruct = struct('pre',ratings.pre.hunger, 'post', ratings.post.hunger, 'afterExperiment', ratings.afterExperiment.hunger);
+%     create_plot_means ('Hunger Ratings', hungerStruct, {'pre', 'post', 'after'} )
+% end
+% 
+% if plot_responses_elaborated
+%     % plot fractal responding
+%     % create_prepost_plot ('Responding ', responding.pre, responding.post);
+%     create_prepost_plot ('Responding 1-Day Group', responding.pre.group.day1, responding.post.group.day1);
+%     create_prepost_plot ('Responding 3-Day Group', responding.pre.group.day3, responding.post.group.day3);
+%     % include reacquisition
+%     create_prePostAfter_plot ('Responding 1-Day Group', responding.pre.group.day1, responding.post.group.day1, responding.reacquisition.group.day1, {'PRE','POST', 'REACQUISITION'});
+%     create_prePostAfter_plot ('Responding 3-Day Group', responding.pre.group.day3, responding.post.group.day3, responding.reacquisition.group.day3, {'PRE','POST', 'REACQUISITION'});
+% end
+% 
+% if plot_change_index
+%     % impact of devaluation on reponding
+%     create_plot_means_simple ('impact of devaluation on change index',  change_index);
+% end
+% 
+% if plot_post_responding_index
+%     post_index.day1   = presspost.group.day1.valued - presspost.group.day1.devalued;
+%     post_index.day3   = presspost.group.day3.valued - presspost.group.day3.devalued;
+%     create_plot_means_simple ('impact of devaluation on post pressing',  post_index);
+% end
+% 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %% LEARNING TRAJECTORIES
+% if plot_learning_trajectories
+%     figure;
+%     subplot(1,4,1)
+%     title('1-Day group')
+%     hold
+%     plot(nanmean(learning.day1group.day1.deval,2),'-o', 'color', [0.2 0.2 0.2], 'MarkerFaceColor',[0 0 0] )
+%     plot(nanmean(learning.day1group.day1.val,2),'-o', 'color',  [0.5 0.8 0.1],'MarkerFaceColor',[0.5 0.8 0.1])
+%     xlabel('Training Trials')
+%     ylabel('Responding')
+%     ylim([2,5])
+% 
+%     for i = 1:3
+%         dayX = ['day' num2str(i)];
+%         subplot(1,4,i+1)
+%         title(['3-Day group - DAY ' num2str(i)])
+%         hold
+%         plot(nanmean(learning.day3group.(['day' num2str(i)]).deval,2),'-o', 'color', [0.2 0.2 0.2], 'MarkerFaceColor',[0 0 0] )
+%         plot(nanmean(learning.day3group.(['day' num2str(i)]).val,2),'-o', 'color',  [0.5 0.8 0.1],'MarkerFaceColor',[0.5 0.8 0.1])
+%         xlabel('Training Trials')
+%         ylim([2,5])
+%     end
+% 
+%     set(gcf, 'Position', [50 100 1200 400])
+%     set(gcf, 'Color', 'w')
+%     box off
+% 
+%     LEG = legend('Devalued','Valued');
+%     set(LEG,'FontSize',12); %
+%     set(LEG,'Box', 'off');
+%     set(LEG, 'Position', [0.850 0.400 0.150 0.100])
+% 
+%     suptitle('LEARNING TRAJECTORIES')
+% end
+% 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %% Save figures and create html
+% if save_all_figures
+%     SaveAllOpenedFigures(figures_dir)
+% end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

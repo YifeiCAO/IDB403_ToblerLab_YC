@@ -13,21 +13,21 @@ function extract_skull_for_preprocessed_functional_images()
 
 % Parameters:
 % ----------------------------------------------------------------------------------------
-participantsListFile = '/export2/DATA/HIS/HIS_server/BIDS/participants.tsv';
-fmriPrepOutputPath   = '/export2/DATA/HIS/HIS_server/BIDS/derivatives/fmriprep/';
-OutputPath           = '/export2/DATA/HIS/HIS_server/analysis/task_fMRI_data/'; % The relevant derivative folder
+participantsListFile = '/Users/yifei/BIDS_tutorial_data/participants.tsv';
+fmriPrepOutputPath   = '/Users/yifei/BIDS_tutorial_data/derivatives/';
+OutputPath           = '/Users/yifei/Desktop/habit_output/task_fMRI_data/'; % The relevant derivative folder
 tasks = {'training', 'extinction', 'reacquisition'};
 areSessions = 1;
 rewriteExistingFiles = 0;
 % ----------------------------------------------------------------------------------------
 % set FSL environment
-setenv('FSLDIR','/share/apps/fsl');  % this to tell where FSL folder is
-setenv('FSLOUTPUTTYPE', 'NIFTI_GZ'); % this to tell what the output type would be
-setenv('PATH', [getenv('PATH') ':/share/apps/fsl/bin']);
+% setenv('FSLDIR','/usr/local/fsl');  % this to tell where FSL folder is
+% setenv('FSLOUTPUTTYPE', 'NIFTI_GZ'); % this to tell what the output type would be
+% setenv('PATH', [getenv('PATH') ':/share/apps/fsl/bin']);
 % if running you can check in the terminal 'echo $FSLDIR' to find the relevant directory. Typically it will be: 
-%setenv('FSLDIR','/usr/local/fsl');  % this to tell where FSL folder is
-%setenv('FSLOUTPUTTYPE', 'NIFTI_GZ'); % this to tell what the output type would be
-%setenv('PATH', [getenv('PATH') ':/usr/local/fsl/bin']);
+setenv('FSLDIR','/usr/local/fsl');  % this to tell where FSL folder is
+setenv('FSLOUTPUTTYPE', 'NIFTI_GZ'); % this to tell what the output type would be
+setenv('PATH', [getenv('PATH') ':/usr/local/fsl/bin']);
 % ----------------------------------------------------------------------------------------
 
 % create subject list:
